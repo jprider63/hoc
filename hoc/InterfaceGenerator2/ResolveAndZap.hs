@@ -9,6 +9,7 @@ import Progress
 
 import Control.Monad.State
 import Data.Maybe       ( fromMaybe, mapMaybe, catMaybes )
+import Prelude hiding ((<>))
 import Text.PrettyPrint.HughesPJ
 
 import qualified Data.ByteString.Char8 as BS

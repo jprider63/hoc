@@ -7,6 +7,9 @@ build-type: Custom
 build-depends: gnustep-config
 extra-tmp-files: HOC-cbits.buildinfo
 
+custom-setup
+  setup-depends:       base, Cabal, gnustep-config
+
 Flag Trace
     default: False
     description: print trace messages to console from low-level code
@@ -45,6 +48,8 @@ Library
                cbits/Statistics.m
                 
     extra-libraries: objc, ffi
+
+    extensions: ConstrainedClassMethods
     
     if os(darwin)
         include-dirs: /usr/include/ffi

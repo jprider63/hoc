@@ -18,6 +18,11 @@ Library
                         th-extras,
                         unix
                    
+    extensions:
+        FlexibleContexts
+        GADTs
+        ScopedTypeVariables
+                   
     exposed-modules:
         HOC,
         HOC.NameCaseChange,
@@ -61,6 +66,11 @@ Executable hoc-ifgen
     main-is: Main.hs
     hs-source-dirs: HOC, InterfaceGenerator2
 
+    extensions:
+        FlexibleContexts
+        GADTs
+        TypeApplications
+                   
     build-depends:      base >= 4,
                         bytestring,
                         containers,

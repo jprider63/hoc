@@ -10,7 +10,7 @@ declareClass :: String -> String -> Q [Dec]
 
 declareClass name super = sequence $ [
         -- data $(phantomName) a
-        dataD (cxt []) (mkName phantomName) [PlainTV (mkName "a")]
+        dataD (cxt []) (mkName phantomName) [PlainTV (mkName "a")] Nothing
             -- the constructor is only here to work around
             -- GHC sourceforge bug #1244882.
             [return $ NormalC (mkName (phantomName ++ "dummy")) []] 

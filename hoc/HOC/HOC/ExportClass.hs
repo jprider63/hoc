@@ -69,8 +69,8 @@ exportClass name prefix members = sequence $ [
         sigD (mkName exportFunName) [t| IO () |],
         valD (varP $ mkName exportFunName)
             (normalB (mkClassExportAction name prefix members)) [],
-        dataD (cxt []) (mkName instanceDataName) []
-            [normalC (mkName instanceDataName) strictTypes] [''Typeable],
+        dataD (cxt []) (mkName instanceDataName) [] Nothing
+            [normalC (mkName instanceDataName) strictTypes] [return $ DerivClause Nothing [ConT ''Typeable]],
         valD (varP $ mkName tyConVar) (normalB [| mkTyCon instanceDataName |]) [],
         instanceD (cxt []) (conT ''InstanceVariables
                             `appT` clsTy `appT` instTy) 
@@ -88,7 +88,7 @@ exportClass name prefix members = sequence $ [
         exportFunName = "initializeClass_" ++ name
         instanceDataName = name ++ "_IVARS"
         tyConVar = "tycon_" ++ name ++ "_IVARS"
-        strictTypes = map (strictType (return IsStrict)) wrappedIvarTypes
+        strictTypes = map (strictType (return $ Bang NoSourceUnpackedness SourceStrict)) wrappedIvarTypes
         ivars = [ (name, ty, [| nil |]) | Outlet name ty <- members ]
              ++ [ (name, ty, initial)   | InstanceVariable name ty initial <- members ]
         wrappedIvarTypes = [ conT ''MVar `appT` ty | (_,ty,_) <- ivars ]
@@ -160,6 +160,7 @@ mkClassExportAction name prefix members =
         nCMethods = length classMethods
         
             -- GHC fails with Prelude.last if we pass it an empty doE
+        fillMethodList :: Bool -> Int -> ExpQ -> [Method] -> ExpQ
         fillMethodList isClassMethod firstIdx objCMethodList [] = [| return () |]  
         fillMethodList isClassMethod firstIdx objCMethodList methods =
             doE $
@@ -169,7 +170,7 @@ mkClassExportAction name prefix members =
         exportMethod isClassMethod objCMethodList
                      (ImplementedMethod selName, num)
             = do
-                VarI _ t _ _ <- reify $ selName
+                VarI _ t _ <- reify $ selName
                 let arrowsToList (AppT (AppT ArrowT a) b)
                         = a : arrowsToList b
                     arrowsToList (AppT (ConT c) b)
@@ -274,6 +275,7 @@ mkClassExportAction name prefix members =
                              
                 instanceType = conT $ mkName name
                 
+                getArg :: (String, Int) -> StmtQ
                 getArg (argname, argnum) =
                     bindS (varP (mkName argname))
                           [| getMarshalledArgument $(varE $ mkName "args") argnum |]

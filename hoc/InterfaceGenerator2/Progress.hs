@@ -3,7 +3,7 @@ module Progress where
 import Control.Concurrent   ( Chan, newChan, writeChan, readChan,
                               newMVar, withMVar, takeMVar,
                               forkIO, killThread )
-import Control.Exception    ( block )
+import Control.Exception    ( mask_ )
 import Control.Monad        ( when )
 import System.IO.Unsafe     ( unsafePerformIO )
 import System.Time
@@ -46,7 +46,7 @@ runShowingProgress msg action
             n <- readChan chan
             let percent = (i * 100) `div` n
             when (percent > reported) $
-                block (putStr $ msg ++ ": " ++ show percent ++ "%\n\x1b[A")
+                mask_ (putStr $ msg ++ ": " ++ show percent ++ "%\n\x1b[A")
             reportLoop chan (i+1) (max percent reported)
 
 reportProgressForMap pr m = 
@@ -147,7 +147,7 @@ openMultiProgress reporters'
                             
                             if (final || timePassed > factor `div` 10)
                                 then do
-                                    withMVar reporterLock $ \_ -> block $ do
+                                    withMVar reporterLock $ \_ -> mask_ $ do
                                         down (line - 1)
                                         printProgress alignAt progress msg
                                         up line

@@ -37,8 +37,8 @@ class CEnum a where
 
 declareCEnum name assocs
     = sequence $ [
-            dataD (cxt []) typ []
-                [ normalC n [] | n <- constructors ] [''Eq, ''Ord, ''Read, ''Show],
+            dataD (cxt []) typ [] Nothing
+                [ normalC n [] | n <- constructors ] [return $ DerivClause Nothing $ map ConT [''Eq, ''Ord, ''Read, ''Show]],
             instanceD (cxt []) (conT ''CEnum `appT` conT typ)
                 {-  -- this causes a strange problem that
                     -- I didn't manage to reproduce yet.

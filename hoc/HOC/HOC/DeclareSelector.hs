@@ -142,11 +142,11 @@ declareRenamedSelector name haskellName typeSigQ =
                         liftForalls $
                         (if needInstance
                             then ForallT (map (PlainTV . mkName) ["target", "inst"])
-                                 [ClassP (mkName className) [VarT (mkName "target")],
-                                  ClassP (mkName "ClassAndObject") [VarT (mkName "target"),
-                                                                    VarT (mkName "inst")]]
+                                 [AppT (ConT (mkName className)) (VarT (mkName "target")),
+                                  AppT (AppT (ConT (mkName "ClassAndObject")) (VarT (mkName "target")))
+                                                                    (VarT (mkName "inst"))]
                             else ForallT [PlainTV $ mkName "target"]
-                                 [ClassP (mkName className) [VarT (mkName "target")]]) $
+                                 [AppT (ConT (mkName className)) (VarT (mkName "target"))]) $
                         replaceResult (
                             (ArrowT `AppT` (fromMaybe (VarT $ mkName "target") targetType))
                             `AppT` covariantResult

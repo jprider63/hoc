@@ -1,9 +1,9 @@
 {-# LANGUAGE PatternGuards, ScopedTypeVariables, ExistentialQuantification #-}
 module BinaryInstances() where
 
-import Data.Binary
+import Data.Binary hiding ( gput, gget)
 import Data.Generics
-import Control.Monad.Fix        ( mfix )
+import Control.Monad.Fix        ( MonadFix(..) )
 import Control.Monad            ( msum )
 import Data.ByteString.Char8    ( ByteString )
 import Data.Maybe               ( fromJust, fromMaybe )
@@ -35,7 +35,7 @@ gput thing
 
         gput1 (BinaryType t) = fmap put $ cast thing `asTypeOf` Just t
     
-gget :: Data a => Get a
+gget :: forall a . Data a => Get a
 gget
     = mfix gget' where
     
@@ -48,11 +48,11 @@ gget
             gget0 = do
                 constr <- case dataTypeRep dataType of
                     IntRep -> do
-                        i <- get
-                        return $ mkIntConstr dataType i
+                        i <- get @Int
+                        return $ mkIntegralConstr dataType i
                     FloatRep -> do
-                        f <- get
-                        return $ mkFloatConstr dataType f
+                        f <- get @Float
+                        return $ mkRealConstr dataType f
                     CharRep -> do
                         c <- get
                         return $ mkCharConstr dataType c
@@ -67,6 +67,8 @@ gget
                 = Just (get >>= \x -> return $ fromJust $ cast $ x `asTypeOf` t)
                 | otherwise = Nothing
 
+instance MonadFix Get where
+    mfix = error "TODO"
 
 -- use gget and ggput to declare Binary instances for the types we need
 

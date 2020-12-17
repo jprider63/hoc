@@ -1,6 +1,6 @@
 {-# LANGUAGE ForeignFunctionInterface, FlexibleContexts, GeneralizedNewtypeDeriving #-}
 module HOC.FFICallInterface(
-        FFICif,
+        FFICif(..),
         FFIType,
         FFITypeable(..),
         ffiPrepCif,

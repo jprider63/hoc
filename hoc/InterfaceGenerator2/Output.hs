@@ -12,6 +12,7 @@ import HOC.NameCaseChange
 
 import Control.Monad        ( guard )
 import Data.Maybe           ( maybeToList )
+import Prelude hiding ((<>))
 import Text.PrettyPrint.HughesPJ
 
 import qualified Data.ByteString.Char8 as BS

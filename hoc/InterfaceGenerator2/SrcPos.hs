@@ -2,6 +2,7 @@
 module SrcPos where
 
 import Data.Generics
+import Prelude hiding ((<>))
 import Text.PrettyPrint.HughesPJ
 import Text.Parsec( sourceName, sourceLine, sourceColumn )
 

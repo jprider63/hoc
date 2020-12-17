@@ -56,10 +56,10 @@ declareCStructWithTag cname mbTag fieldTypes
     = do
         let name = mkName $ nameToUppercase cname
             structTag = fromMaybe "?" mbTag
-        dataDecl <- dataD (cxt []) name [] [
+        dataDecl <- dataD (cxt []) name [] Nothing [
                 normalC name $
-                    map (strictType (return NotStrict)) fieldTypes
-            ] [''Eq, ''Ord] --, ''Read, ''Show]
+                    map (strictType (return $ Bang NoSourceUnpackedness NoSourceStrictness)) fieldTypes
+            ] [return $ DerivClause Nothing $ map ConT [''Eq, ''Ord]] --, ''Read, ''Show]
         
         varNames <- mapM (const $ newName "field") fieldTypes
         ptrName <- newName "ptr"

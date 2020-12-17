@@ -1,4 +1,4 @@
-{-# LANGUAGE DoRec, TypeFamilies, FlexibleInstances, NPlusKPatterns #-}
+{-# LANGUAGE RecursiveDo, TypeFamilies, FlexibleInstances, NPlusKPatterns #-}
 module HOC.ID where
 
 import HOC.Arguments

@@ -42,7 +42,7 @@ makeTraverser theTypeQ wrapCons wrapConsArg primitive specials
                                         (ConT name, argTypes) -> do
                                             info <- lift $ reify name
                                             case info of
-                                                TyConI (DataD cx n argNames cons derivs)
+                                                TyConI (DataD cx n argNames Nothing cons derivs)
                                                     | not (null cons)
                                                     -> do
                                                         --let conNames = map conName cons
@@ -146,14 +146,15 @@ makeTraverser theTypeQ wrapCons wrapConsArg primitive specials
 
         expandVars :: Map.Map String Type -> Type -> Type
         expandVars environment (ForallT names cxt ty)
-            = ForallT names (map (buildPred . expandVars environment') (map extractCxt cxt)) $ expandVars environment' ty
+            -- = ForallT names (map (buildPred . expandVars environment') (map extractCxt cxt)) $ expandVars environment' ty
+            = ForallT names (map (expandVars environment') cxt) $ expandVars environment' ty
             where
-                buildPred t = let buildPredTypes (AppT (ConT n) t)     = [t] 
-                                  buildPredTypes (AppT a@(AppT _ _) t) = t:(buildPredTypes a) 
-                                  extractName (AppT (ConT n) _) = n
-                                  extractName (AppT a _)        = extractName a
-                              in ClassP (extractName t) (buildPredTypes t)
-                extractCxt (ClassP n ts) = foldl' AppT (ConT n) ts  
+                -- buildPred t = let buildPredTypes (AppT (ConT n) t)     = [t] 
+                --                   buildPredTypes (AppT a@(AppT _ _) t) = t:(buildPredTypes a) 
+                --                   extractName (AppT (ConT n) _) = n
+                --                   extractName (AppT a _)        = extractName a
+                --               in ClassP (extractName t) (buildPredTypes t)
+                -- extractCxt (ClassP n ts) = foldl' AppT (ConT n) ts  
                 environment' = foldr Map.delete environment $ map (nameBaseWorkaround . extractName) names
         expandVars environment (VarT name)
             = case Map.lookup (nameBaseWorkaround name) environment of

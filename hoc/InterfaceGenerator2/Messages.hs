@@ -18,11 +18,13 @@ bagToList b = helper b []
         helper (UnitBag x) xs = x : xs
         helper (BagOfTwo a b) xs = helper a $ helper b xs 
 
+instance Semigroup (Bag a) where
+    EmptyBag <> b = b
+--    a <> EmptyBag = a    more lazyness!
+    a <> b = BagOfTwo a b
+
 instance Monoid (Bag a) where
     mempty = EmptyBag
-    mappend EmptyBag b = b
---    mappend a EmptyBag = a    more lazyness!
-    mappend a b = BagOfTwo a b
 
 type Messages = Writer (Bag Doc)
 message d = tell (UnitBag d)
