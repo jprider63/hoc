@@ -61,6 +61,7 @@ headersForFrameworkAt path framework
                 ) $ filter (".framework" `isSuffixOf`) contents
         return $ baseHeaders ++ moreHeaders
         
+headersForFramework :: String -> String -> IO [(FilePath, FilePath, String)] -- header file, header file path, haskell module name
 headersForFramework prefix framework =
     if System.Info.os == "darwin"
         then do
@@ -77,6 +78,7 @@ translateObjCImport imp = haskellizeModuleName $
         slashToDot '/' = '.'
         slashToDot c = c
 
+loadHeaders :: (Bool, Bool) -> ProgressReporter -> [(String, FilePath, String)] -> IO [HeaderInfo]
 loadHeaders (dumpPreprocessed, dumpParsed) progress headers = do
     loaded <- mapM (\(headerFileName, headerPathName, moduleName) -> do
             contents <- readFile $ headerPathName

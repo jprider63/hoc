@@ -51,7 +51,8 @@ To run the unit tests, use:
 2. Create the bindings:
   
   cd Bindings
-  sudo HOC_SDK=MacOSX10.5 sh make-bindings-macos.sh
+  # sudo HOC_SDK=MacOSX10.5 sh make-bindings-macos.sh
+  HOC_SDK=MacOSX10.14 sh make-bindings-macos.sh
   cd ..
   
 3. Build the hoc-wrap tool:

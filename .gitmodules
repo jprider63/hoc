@@ -1,0 +1,3 @@
+[submodule "BridgeSupport"]
+	path = BridgeSupport
+	url = https://github.com/jprider63/BridgeSupport.git

@@ -11,13 +11,14 @@ Flag BinaryInterfaces
 
 Library
     build-depends:      base >= 4,
+                        BridgeSupport,
                         HOC-cbits == 1.0,
                         mtl,
                         syb,
                         template-haskell,
                         th-extras,
-                        unix
-                   
+                        unix,
+                        xml
     extensions:
         FlexibleContexts
         GADTs
@@ -72,6 +73,7 @@ Executable hoc-ifgen
         TypeApplications
                    
     build-depends:      base >= 4,
+                        BridgeSupport,
                         bytestring,
                         containers,
                         directory,
@@ -83,7 +85,8 @@ Executable hoc-ifgen
                         parsec >= 3.0,
                         pretty,
                         syb,
-                        template-haskell
+                        template-haskell,
+                        xml
     
     if flag(BinaryInterfaces)
         build-depends:  binary >= 0.2

@@ -2,16 +2,16 @@ set -x
 function build()
 {
     pushd HOC-$1
-    runhaskell Setup.hs configure $ARGUMENTS
-    runhaskell Setup.hs build
-    runhaskell Setup.hs install
+    stack exec -- runhaskell Setup.hs configure $ARGUMENTS
+    stack exec -- runhaskell Setup.hs build
+    stack exec -- runhaskell Setup.hs install
     popd
 }
 
 ARGUMENTS=$*
-OPTS=
+OPTS=-q
 
-IFGEN="hoc-ifgen"
+IFGEN="stack exec -- hoc-ifgen"
 
 if [ "$HOC_SDK" != "" ];
 then

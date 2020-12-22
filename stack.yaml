@@ -30,6 +30,7 @@ resolver: lts-13.19
 #   - wai
 packages:
 - gnustep-config
+- BridgeSupport
 - hoc-cbits
 - hoc
 

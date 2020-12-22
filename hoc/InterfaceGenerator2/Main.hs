@@ -1,9 +1,11 @@
 {-# LANGUAGE CPP #-}
 module Main where
 
+import qualified Data.BridgeSupport as BridgeSupport
 import qualified Data.ByteString.Char8 as BS
 import qualified Data.Map as Map
 import qualified Data.Set as Set
+import qualified Text.XML.Light as XML
 import Data.Maybe                   ( fromMaybe )
 import Control.Monad                ( when )
 import System.Environment           ( getArgs )
@@ -81,6 +83,8 @@ readFileWithProgress progress fn
 decodeFileWithProgress :: ProgressReporter -> FilePath -> IO EntityMap
 decodeFileWithProgress progress fn
     = do
+        print "decodeFileWithProgress"
+        print fn
         bs <- fmap LBS.toChunks $ LBS.readFile fn
         let n = length bs
         return $ decode $ LBS.fromChunks $ monitorList progress n $ bs
@@ -107,6 +111,7 @@ writeInterfaceFileWithProgress progress fn entities
 data HeaderDirectory
     = FrameworkHeaders String
     | Headers String
+    deriving Show
         
 data Options = Options {
         oFrameworkName :: String,
@@ -159,19 +164,43 @@ processFramework options -- bs frameworkName requiredFrameworks
                                             renameProgress, eliminateProgress,
                                             outputProgress, masterProgress,
                                             exportProgress]
+
+        -- /System/Library/Frameworks/Foundation.framework/Resources/BridgeSupport/Foundation.bridgesupport
+        -- /System/Library/Frameworks/AppKit.framework/Resources/BridgeSupport/AppKit.bridgesupport
+
+        -- Parse bridgesupport files.
+        let framework = "Foundation"
+        let bridgeSupportPath = "/System/Library/Frameworks/Foundation.framework/Resources/BridgeSupport/Foundation.bridgesupport"
+        xmlM <- XML.parseXMLDoc <$> LBS.readFile bridgeSupportPath
+        bridgeSupport <- case xmlM of
+          Nothing ->
+            fail $ "Could not parse XML file: " <> bridgeSupportPath
+          Just xml ->
+            either fail return $ BridgeSupport.readBridgeSupport xml
+        print bridgeSupport
+            
        
+        putStrLn "**** HERE ****"
+        putStrLn $ show $ oHeaderDirectories options
+        putStrLn $ show $ oPrefix options
         headers <- fmap concat $ flip mapM (oHeaderDirectories options) $
                         \hd -> case hd of
                             FrameworkHeaders framework
-                                -> headersForFramework (oPrefix options) framework
+                                -- -> headersForFramework (oPrefix options) framework
+                                -> headersForFramework "/" framework
                             Headers path
                                 -> headersIn path (oFrameworkName options)
+        print headers
 
         loaded <- loadHeaders (oDumpPreprocessed options, oDumpParsed options)
                               parseProgress headers
         
+        print loaded
+
         let enumHacked = map hackEnumNames loaded
 
+        print "readInterfaceFileWithProgress"
+        print requiredFrameworks
         importedEMaps <- mapM (\(fn, progress) ->
                                 readInterfaceFileWithProgress progress
                                     ("HOC-" ++ fn ++ "/" ++ fn ++ ".pi")
