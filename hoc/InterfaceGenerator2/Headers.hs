@@ -1,4 +1,5 @@
 module Headers( ModuleName,
+                haskellizeModuleName,
                 HeaderInfo(..),
                 headersIn,
                 headersForFramework,

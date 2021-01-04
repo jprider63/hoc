@@ -74,3 +74,15 @@ Authors
 Wolfgang Thaller <wolfgang.thaller@gmx.net>
 Andre Pang <ozone@algorithm.com.au>
 
+Bridgesupport
+=============
+
+https://github.com/osxfuse/osxfuse/issues/544#issuecomment-427553400
+https://stackoverflow.com/a/54368942
+
+```
+sudo ln -s "$(xcode-select -p)/Toolchains/XcodeDefault.xctoolchain/usr/lib/libclang.dylib" /usr/local/lib/
+open /Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg
+gen_bridge_metadata -f Foundation -o Foundation.bridgesupport
+gen_bridge_metadata -f AppKit -o AppKit.bridgesupport
+```

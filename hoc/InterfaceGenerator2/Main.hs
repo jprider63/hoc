@@ -13,6 +13,7 @@ import System.Console.GetOpt
 import System.FilePath              ( (</>) )
 import Control.Exception            ( finally )
 
+import BridgeSupport
 import Messages
 import Entities
 import BindingScript
@@ -166,11 +167,12 @@ processFramework options -- bs frameworkName requiredFrameworks
                                             exportProgress]
 
         -- /System/Library/Frameworks/Foundation.framework/Resources/BridgeSupport/Foundation.bridgesupport
+        -- /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Foundation.framework/Headers/
         -- /System/Library/Frameworks/AppKit.framework/Resources/BridgeSupport/AppKit.bridgesupport
 
         -- Parse bridgesupport files.
         let framework = "Foundation"
-        let bridgeSupportPath = "/System/Library/Frameworks/Foundation.framework/Resources/BridgeSupport/Foundation.bridgesupport"
+        let bridgeSupportPath = "/Users/james/Documents/Projects/hoc/hoc/Bindings/bridgesupport/Foundation.bridgesupport"
         xmlM <- XML.parseXMLDoc <$> LBS.readFile bridgeSupportPath
         bridgeSupport <- case xmlM of
           Nothing ->
@@ -179,21 +181,22 @@ processFramework options -- bs frameworkName requiredFrameworks
             either fail return $ BridgeSupport.readBridgeSupport xml
         print bridgeSupport
             
+        let loaded = [bridgeSupportToHeader framework bridgeSupport]
        
-        putStrLn "**** HERE ****"
-        putStrLn $ show $ oHeaderDirectories options
-        putStrLn $ show $ oPrefix options
-        headers <- fmap concat $ flip mapM (oHeaderDirectories options) $
-                        \hd -> case hd of
-                            FrameworkHeaders framework
-                                -- -> headersForFramework (oPrefix options) framework
-                                -> headersForFramework "/" framework
-                            Headers path
-                                -> headersIn path (oFrameworkName options)
-        print headers
+        -- putStrLn "**** HERE ****"
+        -- putStrLn $ show $ oHeaderDirectories options
+        -- putStrLn $ show $ oPrefix options
+        -- headers <- fmap concat $ flip mapM (oHeaderDirectories options) $
+        --                 \hd -> case hd of
+        --                     FrameworkHeaders framework
+        --                         -- -> headersForFramework (oPrefix options) framework
+        --                         -> headersForFramework "/" framework
+        --                     Headers path
+        --                         -> headersIn path (oFrameworkName options)
+        -- print headers
 
-        loaded <- loadHeaders (oDumpPreprocessed options, oDumpParsed options)
-                              parseProgress headers
+        -- loaded <- loadHeaders (oDumpPreprocessed options, oDumpParsed options)
+        --                       parseProgress headers
         
         print loaded
 
@@ -215,15 +218,17 @@ processFramework options -- bs frameworkName requiredFrameworks
                         zip (map BS.pack requiredFrameworks) importedEMaps
         
         let initialEntities = monitor initialProgress $ makeEntities bs enumHacked importedEntities
+        print initialEntities
         
-
         additionalEntities <-
-            maybe (return initialEntities)
-                  (\additionalCode ->
-                        loadAdditionalCode additionalCode
-                                           (map (\(_,_, modName) -> modName) headers)
-                                           initialEntities)
-                  (oAdditionalCode options)
+            (return initialEntities)
+            -- TODO
+            -- maybe (return initialEntities)
+            --       (\additionalCode ->
+            --             loadAdditionalCode additionalCode
+            --                                (map (\(_,_, modName) -> modName) headers)
+            --                                initialEntities)
+            --       (oAdditionalCode options)
         
         let resolvedEntities = monitor resolveProgress $ resolveReferences additionalEntities
             typedEntities = monitor typeProgress $ resolveTypes resolvedEntities

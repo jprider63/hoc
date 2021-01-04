@@ -65,7 +65,33 @@ Library
 
 Executable hoc-ifgen
     main-is: Main.hs
-    hs-source-dirs: HOC, InterfaceGenerator2
+    hs-source-dirs: InterfaceGenerator2
+    other-modules:
+        BinaryInstances
+        BindingScript
+        BridgeSupport
+        BuildEntities
+        CTypeToHaskell
+        DependenceGraphs
+        DuplicateEntities
+        Entities
+        ExpandSynonyms
+        Files
+        HackEnumNames
+        Headers
+        Messages
+        Output
+        Parser
+        ParserBase
+        Preprocessor
+        Progress
+        RenameClashingIdentifiers
+        ResolveAndZap
+        ShuffleInstances
+        SrcPos
+        SyntaxTree
+        THTraversal
+        Traversals
 
     extensions:
         FlexibleContexts
@@ -80,6 +106,7 @@ Executable hoc-ifgen
                         fgl,
                         filepath,
                         gnustep-config,
+                        HOC,
                         mtl,
                         old-time,
                         parsec >= 3.0,
